@@ -1,0 +1,10 @@
+# Comments like this
+delete
+file
+file ../gpp/sim.exe
+break sim.cpp:126
+
+# delete
+# break sim_aux.cpp:597 if (gen_genev::tmpno - 1e-10 < 0)
+# break sim_aux.cpp:522
+# break sim.cpp:122

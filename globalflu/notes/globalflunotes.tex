@@ -1,0 +1,95 @@
+\documentclass[12pt]{article}
+\usepackage{geometry}                
+\geometry{a4paper}               
+\usepackage[parfill]{parskip}    
+\usepackage{graphicx}
+\usepackage{amssymb}
+\usepackage{epstopdf}
+\usepackage{setspace}
+\usepackage{times}
+\usepackage{url}
+\DeclareGraphicsRule{.tif}{png}{.png}{`convert #1 `dirname #1`/`basename #1 .tif`.png}
+
+\begin{document}
+\raggedright
+
+\Large
+Deterministic models of local influenza persistence over multiple seasons
+\normalsize
+
+\vspace{1cm}
+Steven Riley$^1$, Cecile Viboud$^2$, [others?], Derek Smith$^3$ and Colin Russell$^4$
+
+\vspace{1cm}
+$^1$ MRC Outbreak Centre for Analysis and Modelling, Department of Infectious Disease Epidemiology, School of Public Health, Imperial College London
+
+$^2$ NIG Fogarty
+
+$^3$ Cambridge and Erasmus
+
+\clearpage
+\section*{Abstract}
+[Abstract here]
+
+\clearpage
+%\onehalfspacing
+\doublespacing
+
+\section*{Notes}
+\begin{enumerate}
+\item Needs detailed methods next, including parameter choices using all available data. Possibly by fitting available data as well? But needs a clean looking set of methods, then would just present the different criteria
+\end{enumerate}
+
+
+\section*{Introduction}
+\begin{enumerate}
+\item Needs to work in the global circulation examples and some derministic models of influenza dynamics Dushoff et al
+\item Perhaps needs to address more explicitly the use of a deterministic model in a study of persistance
+\end{enumerate}
+
+At many scales, understanding the spatial patterns of influenza transmission and evolution present substantial challenges: a high proportion of influenza infections are either entirely asymptomatic or cause only mild symptoms. Even those cases that are medically attended are difficult to distinguish clinically from other respiratory viruses such as respiratory syncytial virus (RSV) and rhinovirus. Therefore, accurately capturing spatial patterns if infection from population to population and from year to year remains problematic, despite the considerable resources invested in surveillance. However, careful use of proxy data streams sometimes does permit the investigation of interesting spatial ecological hypotheses such as the demonstration of a correlation between seasonal excess mortality and travel data in the United States \cite{Viboud:2006p1326}.
+
+With the widespread availability of specific molecular testing, the 2009 pandemic presented the first real opportunity to analyse spatial patterns of spread of a specific influenza strain; with patterns accurately described by the presence and absence of confirmed cases within a particular population. Although early global spread followed patterns of airline travel \cite{Fraser:2009p4083,Khan:2009p4285}, subsequent within-region spread progressed more slowly than might have been expected. 
+
+In addition to accurate presence absence data, viral sequence also provides an opportunity for much richer spatial analyses, with sophisticated phylogeographic methods being continually developed \cite{Real:2005p14280}. However, standard phylogenetic analyses of isolates from a single population can also provide valuable evidence about key features of spatial transmission patterns. For example, contrasting patterns of persistence of influenza A H3N2 and influenza B have been observed recently in phylogenetic studies of samples from the US and China. There was no phylogenetic evidence of over-wintering of influenza A H3N2 in either large population, whereas, for a number of years, there was compelling phylogenetic evidence that epidemics of influenza B in one season were derived directly from strains that had circulated within that population during the pervious season (Figure 1).
+
+Here, we use deterministic compartmental models of influenza transmission to investigate possible ecological (epidemiological) explanations for these gross differences in phylogentic patterns. Recent comparative analyses of childhood infections in the Netherlands suggests that there may be gross differences between the strains, with Influenza B being less infectious \cite{Bodewes:2011p14282}. We choose a deterministic framework for these analyses to maintain computational tractability and thus be able to obtain model solutions for very long periods of time with many different parameter sets.  
+
+\section*{Results}
+Main claims:
+\begin{itemize}
+\item A complex set of can be generated simply by varying the duration of immunity and the basic reproductive number within reasonable limits. 
+\item Given reasonable seeding assumptions, the difference between trough height and $R=0.9$ seeding incidence is a good indicator of how gross idfferences might manifest themselves.
+\end{itemize}
+
+
+\section*{Discussion}
+
+\section*{Methods}
+
+% Notes. Indexing. ith age group, jth age group, kth population, lth populaton, mth strain. $alpha$ stream rate
+
+% We constructed an individual-based simulation of the transmission of influenza in a large system made up of $k_{max}$ separate connected populations. The total number of individuals in the system was $N$ and the number of individuals in $i$th age group in the $k$th population was $n_{ik}$. The probability that an infectious individual in age group $i$ infected a susceptible individual in age group $j$, in an otherwise susceptible system, was proportional to $x_{ij}$. Similarly, the probability that an infectious individual of age group $i$ in population $k$ infected a susceptible individual in population $l$ was proportional to $y_{ikl}$. Therefore, the probability that an individual in age group $i$ in population $k$ infected an individual in age group $j$ in population $l$, in an otherwise susceptible population, was proportional to $x_{ij}y_{ikl}$. Effectively, we assumed that individuals of different ages could have different travel patterns but that their pattern of age-specific mixing outside their home population was the same as the pattern of mixing within their home population.
+
+% We introduced $m_{max}$ related strains of influenza as a single streaming seed of infections imported from outside the system. At any one time, the stream contained only a single strain, with the time of the last introduction of the $m$th strain defined by $t_m$. Only the subset $U$ of populations were challenged by the stream of importations. For individuals in populations in subset $U$, the probability of an infectious challenge from the stream was defined to be $alpha$   A conti Initially, all individuals in the were susceptible to all strains. Strains were intr  were completely susceptible. However, after infection wit We assumed that for any time and strain, there was a precise underlying value for the concentration of antibodies from an individual required to neutralize a standardized assay. This concentration could, at least in theory, be measured with arbitrary precision on a log2 scale. This underlying precise concentration was defined to be equal to the average, on a log2 scale, of the dilution factor obtained after many assays. For example, if every single assay for a particular sample gave a titre of 1:80, then the underlying value for the that individual for that strain at that time would be $log_2(80)=6.3$. However, if 1/3 of samples give 1:80 and 2/3 give 1:160, then the value would be $log_2(80)/3+2*log_2(160)/3=7.0$.
+
+% We defined the total number of individuals infectious with strain $i$, in age group $j$ and population $k$ at time $t$ to be $I_{ijk}(t)$. The force-of-infection due to strain $i$ experienced by individuals in population $k$ at time $t$ was,
+
+\[\lambda_{}(t)\]
+ 
+\section*{Tables and Figures}
+
+{\bf Figure 1} Comparative phylogeny of influenza A H3N1 and influenza B in the United states and China during 200X to 200X.
+
+{\bf Figure 2} 
+
+\url{http://dl.dropbox.com/u/25743/WHO_sero_AB.jpg}
+
+%\subsection{}
+
+\clearpage
+\bibliographystyle{plain}
+\bibliography{/Users/sriley/Dropbox/biblio/automated/papers_bib}
+
+\end{document}  
+
