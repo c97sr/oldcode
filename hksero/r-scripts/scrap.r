@@ -1,0 +1,5 @@
+rm(list=ls())
+options(error=NULL)
+vecArgs <- commandArgs(trailingOnly=TRUE)
+cat("There are",length(vecArgs),"arguments\n")
+cat("Args are: ",vecArgs,"\n")
