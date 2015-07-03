@@ -1,0 +1,129 @@
+
+1. Datasets
+
+1.1 raw datasets
+
+ For clinic
+ 1.1.1 qv (all clinic subjects that has done quickvue) 
+ 1.1.2 lab (all lab culture result of the clinic subjects)
+
+ For household
+ 1.1.3 hh (all households which have home visits)
+ 1.1.4 control (control group only)
+ 1.1.5 mask (mask group only)
+ 1.1.6 hand (hand hygiene group only)
+
+
+1.2 cleaned datasets
+ 
+ For clinic 
+ 1.2.1 cdc (all subjects at clinic have done quickvue with symptoms and culture results) 
+
+ For household
+
+ Data per household
+ 1.2.2 housechar_output  (general household characteristics)
+
+ Data per household member
+ 1.2.3 demographics (q2 first part) 
+ 1.2.4 baseline data about influenza (q2 second part)
+ 1.2.5 follow up visits data (q3a, q3b, q4 first part)
+ 1.2.6 evaluation questionnaire (q4 2nd part)
+
+ Data per day per household member
+ 1.2.7 symptom diary
+ 1.2.8 hand compliance per day (hand group only)
+ 1.2.9 mask compliance per day (mask group only)
+
+
+1.3 Functions to extract data (071008 reformat function.r)
+
+1.3.1 Functions for 1 household as 1 entry
+
+1.3.1.1 Function for extracting 1 household per row data 
+getallhousehold_thing <-function(hh, namelist, entryname)
+pre: hh = original dataset, namelist = a user defined vector for the column names of the return dataset,
+     entryname = a vector storing the exact entry names in the original dataset 
+post: return a dataset that extract information from the original dataset, automatically inserted hhID and scrID entries
+example: 
+name <- c( "intervention", "q1_familysize")
+entry <- c("q2_arm", "q1_1")
+data <- getallhousehold_thing(hh, name, entry) 
+
+1.3.2 Functions for 1 household 1 member as 1 entry
+ 
+1.3.2.1 Function for extracting all member data
+getallmember_thing <-function(hh,name,entry)
+pre/post: same as 1.3.1.1 , automatically inserted hhID, scrID and which member entries
+example: data <- getallmember_thing(hh, 1, name, entry) 
+
+1.3.2.2 Function for extracting 1 member data
+get1member_thing <-function(hh, household, namelist, entryname)
+pre: hh = original dataset, household = the specific row in the dataset
+     namelist = a user defined vector for the column names of the return dataset,
+     entryname = a vector storing the exact entry names in the original dataset
+post: return a dataset that extract information from the original dataset 
+example: housechar <- get1member_thing(hh, 1, name, entry) 
+
+1.3.3 Functions for 1 household 1 member 1 day as 1 entry
+
+1.3.3.1 Function for extracting all days data
+getallday_thing <-function(hh,name,entry)
+pre/post: same as 1.3.3.1, automatically inserted hhID, scrID, member and day entries 
+example: data <- getallday_thing(hh, name, entry) 
+
+1.3.3.2 Function for extracting 1 day data
+get1day_thing <-function(hh, household, namelist, entryname)
+pre/post: same as 1.3.2.2
+example: get1day_thing (hh, 1, name, entry)
+
+1.3.4 Functions to be used for all resulting dataset
+
+1.3.4.1  extract the data that use comma separated data, return a vector list with boolean entries
+used in the function : addall_list_data(dataset, list_entry, list_name, list_var)
+extract1_list_data <- function(datalist, dataname, datavar){
+pre: datalist = an entry with coma separated data, 
+     dataname = a user defined vector for the column names of the return dataset 
+     datavar = a vector of the exact variables to compare  
+post: return a logical vector for each , 1=yes, 0=no, each symptom has name  
+example: 
+list = "01,02"
+var <- c(01,02,03)
+name <- c("eye","ear","cancer")
+output <-extract1_list_data(list, name, var)
+
+
+1.3.4.2 concatenate the new resulting boolean dataset of the comma separated data entry in the original dataset, 
+        return the concatenated dataset
+addall_list_data <-function(dataset, list_entry, list_name, list_var)
+pre: dataset = the original dataset
+     list_entry = the entry in the dataset which is in comma separated format
+     list_name = a user defined vector for the column names of the new added columns to add at the back of the original dataset 
+     list_var = a vector of the exact variables to compare  
+post: return a concatenated dataset that added boolean columns at the back
+example: output <-addall_list_data(output, output$entry, name, var)
+
+
+1.3.4.3 function for deleting missing entries in the database after data extraction
+
+del_miss <- function(data, datatype){
+pre: data = original dataset 
+     datatype = type of datasets, either "household", "member" or "day"
+     where "household" for dataset with 1 household per entry
+           "member" for dataset with 1 household member per entry
+           "day for dataset with 1 household member 1 day per entry 
+post: output the same dataset with those all the entries are that NA in 1 row deleted
+example: output <-del_miss(output, "member") 
+
+1.3.4.4 function for changing dob to age
+dob_to_age <-function (dob)
+pre: dob = date of birth in y-m-d format
+post: return age by 07-01-01 minus the dob
+example: dob_to_age("88-01-06")
+
+1.3.4.5 function for changing the 2 to 0 as some data entries used 2 for NO.
+change2to0 <-function(entry)
+pre: entry vector has 2s wanna change to 0s
+post: return vector 2s changed to 0s
+example: wheremask_output$ventilation <- change2to0(wheremask_output$ventilation)
+

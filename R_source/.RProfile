@@ -1,0 +1,7 @@
+# SR_wd <- "/mnt/windesk/sourcetmp/r-project"
+# SR_wd <- "Z:\\projects\\sars\\amoy\\eclipse\\R Source"
+# setwd(SR_wd)
+# require("RWinEdt")
+
+cat("Startup commands in .RProfile. Working directory set in shortcut\n")
+

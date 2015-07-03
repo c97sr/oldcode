@@ -1,0 +1,14 @@
+q_base			0.15			# Pairwise infectivity
+q_int_1			0.075			# Efficacy of NPI in reducing the hazard of infection
+q_int_2			0.075			# Efficacy of NPI in reducing the hazard of infection
+t_off_ptp		0.25			# Offset time for person to person transmission
+mu_ptp			2.5				# Mean time (excluding offset) for p-to-p hazard
+alpha_ptp		3				# Variability in p-to-p transmission
+p_symp			0.666			# Probability that an infected individual develops symptoms, Hayden H1N1 delib inf 
+p1_symp			0.3364			# meanlog of lnorm dist for time after infection that symptoms occur
+p2_symp			0.4054			# sdlog of lnorm dist for time after infection that symptoms occur
+h_B				0.005			# Constant background hazard of infection
+back_symp		0.005			# Constant background hazard of symptoms (not due to influenza infection)
+h_detect		0.001			# Lower threshold for hazard of infection which can be detected
+sens			0.9				# Sensitivity in detecting infection, p(test=inf | reality=inf) 
+spec			0.95			# Specificity in detecting infection, p(test=!inf | reality=!inf)

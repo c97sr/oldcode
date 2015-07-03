@@ -1,0 +1,9 @@
+t_max 					9		# Maximum time after clinical report that observations were made
+t_min 					-7		# Minimum time before clinical report which is included in the calculation 
+t_U_max					0.5		# Maximum change in infection times in MCMC updates
+totSamples				100		# Total number of MCMC samples
+sampFreq				1		# Frequency of recording of MCMC samples
+noSampStored			10		# Number of samples to store before writing
+weightParams			1		# Relative probability of proposing a parameter update
+weightTime				5		# Relative probability of proposing a time update
+weightImmune			0		# Relative probability of proposing an immune update

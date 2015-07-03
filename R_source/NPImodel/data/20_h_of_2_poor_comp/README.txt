@@ -1,0 +1,2 @@
+- No 2nd visits at all
+- Potential secondary cases have no 3rd visit

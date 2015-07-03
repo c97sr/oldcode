@@ -1,0 +1,30 @@
+jeParams <- c(
+    mu_m = 1/21,
+    v_s =  10,
+    N_m = 1000,
+    N_p = 300000,
+    E_m0 = 1,
+    I_p0 = 1,
+    N_site_TK = 135.52,
+    N_site_LK = 189.77,
+    N_site_PM = 6.1319,
+    tw_g = 987.77,  # time weight growth
+    tw_h = 1277.7,  # time weight high
+    tw_f = 129.54,  # time weight fade
+    tw_l = 172.57,  # time weight low
+    a_max = 180,
+    n_a = round(6),
+    n_i = round(2),
+#    ave_imm_p = 46.14,
+#    ave_imm_p = 46.14/30,
+    ave_imm_p = 0.8225,  #assuming 90% lost immunity by the end of 12th week
+    p_m = 1,
+    p_p = 1,
+    omega = 0.1,
+    R0Max = 5,
+    gamma_m = 1/17, # temporarily change to 1 (very short incubation period) (Jun 10)
+#	gamma_m = 1/1,
+    sigma_p = 1/6,  # temporarily increase infectious period for pigs
+#	sigma_p = 1/42,
+    start=0
+)
