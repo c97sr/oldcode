@@ -1,0 +1,10 @@
+[ascii_population]fn_ascii_pop,0,SmallGZLandScanAscii.txt
+[number of divisions in x for distance assignment]nx,1,1
+[final time]tf,1,180
+[time step]dt,1,0.25
+[timestep measure]dtm,1,0.25
+[number of realizations]nr,1,5
+[duration of infectiousness]D_I,1,2.6
+[basic reproductive number in a single pop]R_0,1,1.0
+[effective duration of immunity]D_R,1,1440
+[rate of seeding]beta_s,1,0.000001

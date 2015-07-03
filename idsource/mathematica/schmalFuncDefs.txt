@@ -1,0 +1,343 @@
+(* 
+
+Copyright Steven Riley (sr@stevenriley.net)
+
+This file is part of the library idsource.
+
+idsource is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This work is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this idsource.  If not, see <http://www.gnu.org/licenses/>.
+
+*)
+
+(* Parameters setting the shape of the equations *)
+wmaxPreg = 6;
+maxLSHosts = 1;
+maxfetalStates = 2;
+maxDisStates = 4;
+lengthOfYear = 12;
+wMaxSheep = 12*4;
+wMaxTime = 24;
+repDi = 1;
+tArrival = 4.5;
+
+(* Housekeeping run parameters accurate host pop part not working *)
+
+startmonth = 0;
+accurateHostPop = False;
+
+(* Farm demoagraphy *)
+peaknosheep = 600;
+wkStartService = 9;
+durService = 0.1;
+probService = 0.999999;
+hazProbService = -Log[1 - probService]/durService;
+youngestService = lengthOfYear;
+fAve = 2;
+wkStartSlaughter = 6;
+durSlaughter = 0.1;
+probSlaughter = 1* 5/6;
+hazSlaughter = -Log[1 - probSlaughter]/durSlaughter;
+oldestSlaughter = lengthOfYear;
+ninthsinitiallambs = 6;
+ninthsinitialewes = 1;
+
+(* Biological parameters *)
+LV = 0.5;
+DVE = 0.4;
+DLI = 6/7;
+DLE = 4/7;
+pVtL = 1;
+pLtV = 1;
+bRate = 0.3;
+firstWkTera = 2;
+lastWkTera = 4;
+durTera = (lastWkTera - firstWkTera) + 1;
+probTera = 0.9999;
+hazTera =  -Log[1 - probTera]/durTera;
+pHibe = 0;
+pAest = 0;
+startAest = 4;
+startHibe = 10;
+durHibe = 1;
+hazHibe = -Log[1 - pHibe]/durHibe;
+hazAest = -Log[1 - pAest]/durHibe;
+pOverwinter = 1;
+
+
+(* Function for ewes to become pregnant needs altering for multi \
+annual solutions*)
+
+fnBecomePreg[X_, a_, t_] := 
+ If[(X == 1 && Mod[t, lengthOfYear] >= wkStartService) && ( 
+    Mod[t, lengthOfYear] < (wkStartService + durService) ) && 
+   a > youngestService, hazProbService, 0]
+
+(* Function for the slaughter of young lambs, slaughter is assumed \
+not to overlap with service *)
+
+fnSlaughter[X_, a_, t_] := 
+ If[(X == 1 && Mod[t, lengthOfYear] >= wkStartSlaughter) && ( 
+    Mod[t, lengthOfYear] < (wkStartSlaughter + durSlaughter) ) && 
+   a < oldestSlaughter, hazSlaughter, 0]
+
+(* Functions for hibernation and aestivation of vectors *)
+
+fnHazAest[t_] := 
+  If[(Mod[t, lengthOfYear] >= 
+      startAest) && (Mod[t, lengthOfYear] < (startAest + durHibe)), 
+   hazAest, 0];
+fnHazHibe[t_] := 
+  If[(Mod[t, lengthOfYear] >= startHibe && 
+     Mod[t, lengthOfYear] < (startHibe + durHibe)), hazHibe, 0];
+
+(* Define force of infection from vectors to livestock *)
+(* \
+lambdaVecToLS[t_] := pVtL * bRate * vecinf[t] / \
+(vecsus[t]+vecinf[t]+vecinc[t]) *)
+(* this is an approximation - best \
+solution is to run the model twice. Once wihtout infection and the \
+the next time with. record the host pop number son first run and feed \
+into the second *)
+
+lambdaVecToLS[t_] := 
+  If[accurateHostPop, pVtL * bRate * vecinf[t]/preCookedHosts[t], 
+   pVtL * bRate * vecinf[t] / peaknosheep];
+
+(* Define force of infection from livestock to vectors *)
+
+lambdaLStoVec[t_] := 
+  If[accurateHostPop, 
+   pLtV * bRate *  
+    Total[Flatten[
+       Table[sus[X][p][a][3][f][t], {X, 1, maxLSHosts}, {p, 1, 
+         wmaxPreg}, {a, 1, wMaxSheep}, {f, 1, maxfetalStates}]]] /
+     preCookedHosts[t],  
+   pLtV * bRate *  
+    Total[Flatten[
+       Table[sus[X][p][a][3][f][t], {X, 1, maxLSHosts}, {p, 1, 
+         wmaxPreg}, {a, 1, wMaxSheep}, {f, 1, maxfetalStates}]]] / 
+     Total[Flatten[
+       Table[sus[X][p][a][s][f][t], {X, 1, maxLSHosts}, {p, 1, 
+         wmaxPreg}, {a, 1, wMaxSheep}, {s, 1, maxDisStates}, {f, 1, 
+         maxfetalStates}]]] ]  ;
+
+(* Generating equation for the model *)
+(* Next events needed are \
+become infectious, *)
+
+genddtsus[X_Integer, p_Integer, a_Integer, s_Integer, f_Integer] := 
+  sus[X][p][a][s][f]'[t] == 
+   If[a == 1 && p == 1 && f == 1 , 1, 0]*fAve * 
+     Total[Flatten[
+       Table[sus[X][wmaxPreg][adash][s][1][t] + 
+         sus[X][wmaxPreg][adash][s][2][t], {adash, 1, wMaxSheep}]]] + 
+    If[p == 1  && a > 1, 1, 
+      0] (sus[X][p][a - 1][s][f][t] + 
+       sus[X][wmaxPreg][a - 1][s][f][t] - 
+       fnBecomePreg[X, a, t] sus[X][p][a][s][f][t]) - (1 + 
+       fnSlaughter[X, a, t] ) sus[X][p][a][s][f][t]  + 
+    If[p > 2 && a > 1, 1, 0] sus[X][p - 1][a - 1][s][f][t] + 
+    If[p == 2 && a > 1, 1, 0] fnBecomePreg[X, a, 
+      t] sus[X][p - 1][a][s][f][t] - 
+    If[s == 1, 1, 0] lambdaVecToLS[t] sus[X][p][a][s][f][t] + 
+    If[s == 2, 1, 
+      0] (lambdaVecToLS[t] sus[X][p][a][s - 1][f][t] - 
+       sus[X][p][a][s][f][t]/DLE) + 
+    If[s == 3, 1, 0] ( 
+      sus[X][p][a][s - 1][f][t]/DLE - sus[X][p][a][s][f][t]/DLI) + 
+    If[s == 4, 1, 0] (sus[X][p][a][s - 1][f][t]/DLI) + 
+    If[s == 3 && f == 1 && p >= firstWkTera && 
+      p <= lastWkTera, -hazTera sus[X][p][a][s][f][t], 0] + 
+    If[s == 3 && f == 2 && p >= firstWkTera && 
+      p <= lastWkTera, +hazTera sus[X][p][a][s][f - 1][t], 0];
+
+(* Function to generate the CAR - needed here *)
+
+(* Define the initial conditions *)
+
+genICsus[1, 1, 1, 1, 1] := 
+  sus[1][1][1][1][1][0] == ninthsinitiallambs*peaknosheep/9;
+genICsus[1, 1, 
+   lengthOfYear - wkStartService - wmaxPreg + 1*lengthOfYear, 1, 1] := 
+  sus[1][1][
+       lengthOfYear - wkStartService - wmaxPreg + 1*lengthOfYear][1][
+     1][0] == ninthsinitialewes *peaknosheep/9;
+genICsus[1, 1, 
+   lengthOfYear - wkStartService - wmaxPreg + 2*lengthOfYear, 1, 1] := 
+  sus[1][1][
+       lengthOfYear - wkStartService - wmaxPreg + 2*lengthOfYear][1][
+     1][0] == ninthsinitialewes *peaknosheep/9;
+genICsus[1, 1, 
+   lengthOfYear - wkStartService - wmaxPreg + 3*lengthOfYear, 1, 1] := 
+  sus[1][1][
+       lengthOfYear - wkStartService - wmaxPreg + 3*lengthOfYear][1][
+     1][0] == ninthsinitialewes * peaknosheep/9;
+
+genICsus[X_Integer, p_Integer, a_Integer, s_Integer, f_Integer] := 
+  sus[X][p][a][s][f][0] == 0;
+
+(* Define a function to exapnd the equations approproately *)
+(* XXXX \
+Do the lines below make sense for two dimensinal expansion? *)
+
+expandddt[fn_, X_Integer, maxp_Integer, maxa_Integer, maxs_Integer, 
+   maxf_Integer] := 
+  Table[fn[X, p, a, s, f], {p, 1, maxp}, {a, 1, maxa}, {s, 1, 
+    maxs}, {f, 1, maxf}];
+expandstates[fn_, X_Integer, maxp_Integer, maxa_Integer, 
+   maxs_Integer, maxf_Integer] := 
+  Table[fn[X][p][a][s][f], {p, 1, maxp}, {a, 1, maxa}, {s, 1, 
+    maxs}, {f, 1, maxf}];
+
+(* Define a simple vector model *)
+
+veceqns :=
+  {vecsus'[t] == -lambdaLStoVec[t] vecsus[t]  - 
+     HeavisidePi[t - tArrival - 1/2] + (vecinc[t] + vecinf[t])/LV  + 
+     fnHazAest[t]*vecsusdash[t] - fnHazHibe[t]*vecsus[t]  ,
+   vecinc'[t] ==  
+    lambdaLStoVec[t]* vecsus[t] + HeavisidePi[t - tArrival - 1/2] - 
+     vecinc[t]/DVE - vecinc[t]/LV  + fnHazAest[t]*vecincdash[t] - 
+     fnHazHibe[t]*vecinc[t],
+   vecinf'[t] == 
+    vecinc[t]/DVE - vecinf[t]/LV  + fnHazAest[t]*vecinfdash[t] - 
+     fnHazHibe[t]*vecinf[t],
+   veccar'[t] == lambdaLStoVec[t]* vecsus[t],
+   vecsusdash'[t] == - fnHazAest[t]*vecsusdash[t] + 
+     fnHazHibe[
+       t]*(vecsus[t] + (1 - pOverwinter) (vecinc[t] + vecinf[t]) ),
+   vecincdash'[t] == - fnHazAest[t]*vecincdash[t] + 
+     pOverwinter *fnHazHibe[t]* vecinc[t],
+   vecinfdash'[t] == - fnHazAest[t]*vecinfdash[t] + 
+     pOverwinter*fnHazHibe[t]*vecinf[t],
+   vecsusdash[0] == 0,
+   vecincdash[0] == 0,
+   vecinfdash[0] == 0,
+   veccar[0] == 0,
+   vecsus[0] == 
+    vecperinitialhost * (ninthsinitiallambs + 3*ninthsinitialewes)*
+      peaknosheep/9  - 1,
+   vecinc[0] == 0,
+   vecinf[0] == 0};
+
+(* Metric equations *)
+meteqns := {
+  AllCumPreg'[t] ==  
+   Total[Flatten[
+     Table[sus[X][wmaxPreg][adash][s][1][t] + 
+       sus[X][wmaxPreg][adash][s][2][t], {X, 1, maxLSHosts}, {adash, 
+       1, wMaxSheep}, {s, 1, maxDisStates}]]] ,
+  AllCumPreg[0] == 0,
+  FACumPreg'[t] ==   
+   Total[Flatten[
+     Table[sus[X][wmaxPreg][adash][s][2][t], {X, 1, 
+       maxLSHosts}, {adash, 1, wMaxSheep}, {s, 1, maxDisStates}]]] , 
+  FACumPreg[0] == 0
+  }
+
+(* Expand the equations to generate main args for NDSolve *)
+
+eqns := Flatten[{
+    expandddt[genddtsus, 1, wmaxPreg, wMaxSheep, maxDisStates, 
+     maxfetalStates],
+    expandddt[genICsus, 1, wmaxPreg, wMaxSheep, maxDisStates, 
+     maxfetalStates], 
+    veceqns, meteqns
+    }];
+
+(* Make the state variables for NDSolve*)
+states := Flatten[{
+    expandstates[sus, 1, wmaxPreg, wMaxSheep, maxDisStates, 
+     maxfetalStates],
+    {vecsus, vecinc, vecinf, veccar, vecsusdash, vecincdash, 
+     vecinfdash}, {AllCumPreg, FACumPreg}
+    }];
+
+(* Make a single solution *)
+testmod[R0_ : 10] := Module[{},
+  
+  vecperinitialhost = 
+   If[R0 > 0, (1 + DVE/LV) R0/(bRate^2  pLtV pVtL LV DLI), 0];
+  dynloopk = 0;
+  accurateHostPop = False;
+  solpre = 
+   NDSolve[eqns , states , {t, 0, wMaxTime}, 
+    EvaluationMonitor :> {dynloopk = t}, MaxStepSize -> 0.09];
+  preCookedHosts[t_] =  
+   Total[Flatten[
+     Table[sus[X][p][a][s][f][t] /. solpre, {X, 1, maxLSHosts}, {p, 1,
+        wmaxPreg}, {a, 1, wMaxSheep}, {s, 1, maxDisStates}, {f, 1, 
+       maxfetalStates}]]] ;
+  dynloopk = 0;
+  accurateHostPop = True;
+  solution = 
+   NDSolve[eqns, states, {t, 0, wMaxTime}, 
+    EvaluationMonitor :> {dynloopk = t}, MaxStepSize -> 0.09]
+  
+  ]
+
+(* Functions to extract info from the solutions *)
+
+tsTime := Table[t, {t, startmonth, startmonth + wMaxTime, repDi}];
+tsAllHosts[t_] :=  
+  Total[Flatten[
+    Table[sus[1][p][a][s][f][t] , {p, 1, wmaxPreg}, {a, 1, 
+      wMaxSheep}, {s, 1, maxDisStates}, {f, 1, maxfetalStates}]]];
+tsSushosts[t_, sol_] := 
+  Total[Flatten[
+    Table[sus[1][p][a][1][1][t] /. sol, {p, 1, wmaxPreg}, {a, 1, 
+      wMaxSheep}]]];
+tsIncvec[sol_, wmax_ : wMaxTime, repdt_ : 1] := 
+  Flatten[{0, 
+    Table[veccar[t], {t, repdt, wmax, repdt}] / repdt - 
+      Table[veccar[t], {t, 0, wmax - repdt, repdt}] / repdt  /. 
+     sol}];
+firstYearFA[sol_] := 
+ FACumPreg[lengthOfYear]/ AllCumPreg[lengthOfYear]  /. sol
+FAt1t2[sol_, t1_, 
+  t2_] := (FACumPreg[t2] - FACumPreg[t1])/ (AllCumPreg[t2] - 
+     AllCumPreg[t1])  /. sol
+timeYearEweSero[sol_, t_] := 
+ Total[Flatten[
+     Table[sus[X][p][a][4][f][t], {X, 1, maxLSHosts}, {p, 1, 
+       wmaxPreg}, {a, 1, wMaxSheep}, {f, 1, maxfetalStates}]]]  / 
+   Total[Flatten[
+     Table[sus[X][p][a][s][f][t], {X, 1, maxLSHosts}, {p, 1, 
+       wmaxPreg}, {a, 1, wMaxSheep}, {s, 1, maxDisStates}, {f, 1, 
+       maxfetalStates}]]]  /. sol
+
+(* A plot of total hosts *)
+
+lineHostDemog[solin_, tmax_: wMaxTime] := Plot[
+   tsAllHosts[t] /. solin,
+   {t, 0, tmax},
+   PlotRange -> {Automatic, {0, 800}},
+   PlotStyle -> {{Red, Dashed, Thick}},
+   PlotPoints -> 50,
+   MaxRecursion -> 0];
+
+(* A plot of the vector dynamics *)
+lineVectorDemog[solin_] := Plot[
+   vecsus[t] + vecinc[t] + vecinf[t] /. solin,
+   {t, 0, wMaxTime},
+   PlotRange -> {Automatic, {0, 2*10^12}},
+   PlotStyle -> {{Blue, Dashed, Thick}},
+   PlotPoints -> 50,
+   MaxRecursion -> 0];
+
+(* A plot of the vector incidence *)
+lineVectorIncidence[solin_, wmax_ : 10] := ListPlot[
+   tsIncvec[solin, wmax = wmax],
+   PlotRange -> {Automatic, {0.5, 0.6}},
+   Joined -> True,
+   PlotStyle -> {{Black}}];
