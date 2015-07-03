@@ -1,0 +1,4 @@
+"Scenario","doubling_time","mixing","prop_pop_c","prop_pop_y","prop_pop_o","sus_c","sus_y","sus_o","init_c","init_y","init_o"
+1,4,1,0.33,0.33,0.33,1,1,1,1,1,1
+1,5,1,0.33,0.33,0.33,1,1,1,1,1,1
+1,6,1,0.33,0.33,0.33,1,1,1,1,1,1
