@@ -669,5 +669,5 @@ void StateVariable::PrintCerr(int age) {
 		}
 		cerr << "\n";
 	}
-	cerr << "\n";q
+	cerr << "\n";
 }
