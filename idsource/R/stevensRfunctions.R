@@ -7335,17 +7335,17 @@ fnSets <- function(N=10,timesteps=30,reals=10) {
 # pdf(file="~/Dropbox/tmp/rout1.pdf")
 # plot(mod1$inf_inc,type="l")
 # dev.off()
-tex.seir.basic <- function(	
-	  De=1.48,			# Duration latent
-		Tg=2.6,				# Generation time
-		R0=1.8,				# Basic reproductive number
+comp.seir <- function(	
+	  	De=1.48,		# Duration latent
+		Tg=2.6,			# Generation time
+		R0=1.8,			# Basic reproductive number
 		N=6800000,		# Population size
-		I0=10,				# Initial number infective
-		dt=1,			    # Timestep
-		R1=1.0,       # Second R value
-		t1=999,       # time point of change
-		R2=1.0,       # Third R value
-		t2=9999,      # time point of change
+		I0=10,			# Initial number infective
+		dt=1,			# Timestep
+		R1=1.0,         # Second R value
+		t1=999,         # time point of change
+		R2=1.0,         # Third R value
+		t2=9999,        # time point of change
 		noTimeSteps=10,
 		deterministic=TRUE) {
 	
