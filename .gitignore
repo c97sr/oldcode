@@ -30,3 +30,4 @@
 # SR's additions
 *.project
 
+.Rproj.user

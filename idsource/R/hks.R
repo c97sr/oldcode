@@ -2161,7 +2161,7 @@ hks.wave.strain.severity <- function(
   # Make the chart of the ratios
   nopoints <- dim(ratiotab)[1]
   xlims <- c(0,nopoints+1)
-  srg.setup.pdf(findex="",file=fnChart,pw=4,ph=7,xpd=FALSE,textscale=10/12)
+  pdf.figure.proof(findex="",file=fnChart,pw=4,ph=7,xpd=FALSE,textscale=10/12)
     plot(1:2,xlim=xlims,ylim=ylims,axes=FALSE,log="y",type="n")    
     lines(c(0,nopoints+1),c(1,1),lty="dashed",col="black",lwd=2)
     axis(2,las=2)

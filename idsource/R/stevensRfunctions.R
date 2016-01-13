@@ -137,7 +137,7 @@ sr1DHist <- function(vec,min=0,max=1,bins=10,login=FALSE) {
 		bin_id <- floor(tmp[i]*bins)+1
 		if (bin_id > 0 && bin_id <= bins) rtn$f[bin_id] <- rtn$f[bin_id] + 1 
 	}
-	
+
 	rtn
 	
 }
@@ -9154,3 +9154,23 @@ srg.print.format <- function(x) {
   format(signif(x,3),scientific=FALSE,big.mark=",",drop0trailing=TRUE)
 }
 
+pdf.figure.proof <-
+		function(findex=1,file=paste("./pdf_sub_",findex,".pdf",sep=""),pw=7,ph=7,textscale=0.6,xpd=NA) {
+	plotwidth <- pw/cm(1)
+	plotheight <- ph/cm(1)
+	margin <- 5/cm(1)
+	pdfwidth <- plotwidth+2*margin
+	pdfheight <- plotheight+2*margin
+	posplot = c(
+			margin/pdfwidth,
+			(margin+plotwidth)/pdfwidth,
+			margin/pdfheight,
+			(margin+plotheight)/pdfheight
+	)
+	pdf(file=file,height=pdfheight,width=pdfwidth,useDingbats=FALSE)
+	par(
+			cex=textscale,
+			fig=posplot,
+			mai=c(0,0,0,0),
+			xpd=xpd)
+}
